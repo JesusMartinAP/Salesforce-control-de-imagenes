@@ -52,5 +52,21 @@ if identificacion_link:
         print("Imágenes:", match.group(1).strip())
     else:
         print("No se encontró la sección de 'Imágenes:'.")
+    
+    # Paso 7: Hacer clic en la imagen de Salesforce después de imprimir el texto
+    time.sleep(2)
+    salesforce_logo = pyautogui.locateCenterOnScreen('salesforce_logo.png', confidence=0.8)
+    if salesforce_logo:
+        pyautogui.click(salesforce_logo)
+        time.sleep(2)
+        
+        # Paso 8: Hacer clic en la nueva imagen de Productos
+        productos_icon = pyautogui.locateCenterOnScreen('productos_icon.png', confidence=0.8)
+        if productos_icon:
+            pyautogui.click(productos_icon)
+        else:
+            print("No se encontró la imagen de Productos.")
+    else:
+        print("No se encontró la imagen de Salesforce.")
 else:
     exit()
