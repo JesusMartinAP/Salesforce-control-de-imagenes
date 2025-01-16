@@ -1,66 +1,56 @@
 import pyautogui
 import pyperclip
 import time
+import re
 
 # Código a ingresar en el campo de búsqueda
 codigo_producto = "10066741003"
 
-print("El script comenzará en 5 segundos...")
-
 # Esperar 5 segundos antes de iniciar
 time.sleep(5)
 
-# Paso 1: Buscar el campo de búsqueda mediante imagen
+# Paso 1: Buscar el campo de búsqueda y escribir el código
 campo_busqueda = pyautogui.locateCenterOnScreen('campo_busqueda.png', confidence=0.8)
 if campo_busqueda:
-    pyautogui.click(campo_busqueda)  # Clic en el campo de búsqueda
+    pyautogui.click(campo_busqueda)
     time.sleep(1)
-    pyautogui.hotkey('ctrl', 'a')  # Seleccionar texto previo (si lo hubiera)
-    pyautogui.press('backspace')   # Borrar cualquier texto existente
+    pyautogui.hotkey('ctrl', 'a')
+    pyautogui.press('backspace')
     pyautogui.write(codigo_producto)
-    print("Código ingresado correctamente.")
 else:
-    print("No se encontró el campo de búsqueda. Verifica la imagen 'campo_busqueda.png'.")
     exit()
 
-# Paso 2: Buscar el botón "Buscar" mediante imagen y hacer clic
+# Paso 2: Buscar el botón "Buscar" y hacer clic
 buscar_button = pyautogui.locateCenterOnScreen('buscar.png', confidence=0.8)
 if buscar_button:
     pyautogui.click(buscar_button)
-    print("Búsqueda realizada correctamente.")
 else:
-    print("No se encontró el botón 'Buscar'. Verifica la imagen 'buscar.png'.")
     exit()
 
-# Paso 3: Buscar y hacer clic en el enlace de la columna "Identificación"
-time.sleep(3)  # Esperar a que cargue la tabla
-identificacion_link = pyautogui.locateCenterOnScreen('identificacion.png', confidence=0.8)
+# Paso 3: Hacer clic en el enlace de la columna "Identificación"
+time.sleep(5)
+identificacion_link = pyautogui.locateCenterOnScreen('identificacion.png', confidence=0.6)
 if identificacion_link:
     pyautogui.click(identificacion_link.x, identificacion_link.y + 20)
-    print("Clic en los dígitos de la columna 'Identificación' realizado correctamente.")
-else:
-    print("No se encontró el enlace de identificación. Verifica la imagen 'identificacion.png'.")
+    time.sleep(3)
 
-# Paso 4: Hacer 2 scroll hacia abajo
-print("Realizando scroll hacia abajo...")
-pyautogui.scroll(-800)
-time.sleep(1)
-pyautogui.scroll(-800)
-time.sleep(2)
+    # Paso 4: Clic directo en el centro de la pantalla para asegurar el foco en la web
+    screen_width, screen_height = pyautogui.size()
+    pyautogui.click(screen_width // 2, screen_height // 2)
+    time.sleep(1)
 
-# Paso 5: Buscar el apartado de imágenes y seleccionar el texto
-print("Buscando el apartado de imágenes...")
-apartado_imagen = pyautogui.locateCenterOnScreen('apartado_imagen.png', confidence=0.8)
-if apartado_imagen:
-    # Mover el cursor al texto a la derecha de la imagen y seleccionar
-    pyautogui.moveTo(apartado_imagen.x + 150, apartado_imagen.y)
-    pyautogui.mouseDown()
-    pyautogui.moveRel(600, 0)  # Ampliar selección para capturar todo el texto
-    pyautogui.mouseUp()
+    # Paso 5: Seleccionar todo y copiar
+    pyautogui.hotkey('ctrl', 'a')
     time.sleep(1)
-    pyautogui.hotkey('ctrl', 'c')  # Copiar el texto seleccionado
+    pyautogui.hotkey('ctrl', 'c')
     time.sleep(1)
-    texto_copiado = pyperclip.paste()  # Obtener el texto copiado del portapapeles
-    print("Texto del apartado de imágenes:", texto_copiado.strip())
+
+    # Paso 6: Extraer e imprimir solo la sección de "Imágenes:"
+    texto_copiado = pyperclip.paste()
+    match = re.search(r'Imágenes:\s*(.*?)\n', texto_copiado, re.DOTALL)
+    if match:
+        print("Imágenes:", match.group(1).strip())
+    else:
+        print("No se encontró la sección de 'Imágenes:'.")
 else:
-    print("No se encontró el apartado de imágenes. Verifica 'apartado_imagen.png'.")
+    exit()
